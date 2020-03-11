@@ -1,7 +1,7 @@
 from PIL import Image 
   
 # creating a image object 
-im = Image.open("oranges.jpg").convert('LA')
+im = Image.open("crosswalk.jpg").convert('LA')
 WIDTH = im.size[0]
 HEIGHT = im.size[1]
 px = im.load() 
@@ -15,6 +15,8 @@ def initialize_id_vector(width, height):
 def id_bodies_from_img(image):
     WIDTH = image.size[0]
     HEIGHT = image.size[1]
+    print(WIDTH)
+    print(HEIGHT)
     px = image.load()
     bodies = initialize_id_vector(WIDTH, HEIGHT)
 
@@ -33,25 +35,27 @@ def id_bodies_from_img(image):
             px[k, i] = bodies[i][k], 255
 
     im.show()
+    return im
+
 def identify_pix(px, i, k, bodies, size):
-    threshold = 5
+    threshold = 7
     if (i == 0 and k == 0):
         bodies[k][i] = 0
         return
     if (i > 0):
-        if (px[i, k][0] == px[i-1, k][0]):
+        if ((px[i, k][0] - px[i-1, k][0]) <= threshold):
             bodies[k][i] = bodies[k][i-1]
             return 
         if (k > 0):
-            if (px[i, k][0] == px[i-1, k-1][0]):
+            if ((px[i, k][0] - px[i-1, k-1][0]) <= threshold):
                 bodies[k][i] = bodies[k-1][i-1]
                 return
     if (k > 0):
-        if (px[i, k][0] == px[i, k-1][0]):
+        if ((px[i, k][0] - px[i, k-1][0]) <= threshold):
             bodies[k][i] = bodies[k-1][i]
             return
-        if (i < size[0]):
-            if (px[i, k] == px[i+1, k-1][0]):
+        if (i < size[0]-1):
+            if ((px[i, k][0] - px[i+1, k-1][0]) <= threshold):
                 bodies[k][i] = bodies[k-1][i+1]
                 return
     
@@ -64,7 +68,7 @@ def identify_pix(px, i, k, bodies, size):
 #     print()
 
 
-id_bodies_from_img(im)
+id_bodies_from_img(id_bodies_from_img(im))
 
 # print (px[4, 4]) 
 # px[4, 4] = (0, 0) 
